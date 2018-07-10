@@ -96,9 +96,31 @@ class App extends React.Component {
 
     addName = (event) => {
         event.preventDefault()
+
+        const replace = (name, newNumber) => {
+            const person = this.state.persons.find(n => n.name === name)
+            const updatedperson = { ...person, number: newNumber }
+            console.log(updatedperson)
+            personService
+                .update(updatedperson.id, updatedperson)
+                .then(response => {
+                    this.setState({
+                        persons: this.state.persons.map(
+                            p => p.id !== person.id ? p : response.data),
+                        newName: '',
+                        newNumber: ''
+                    })
+                })
+        }
+
         if (this.isNameInCatalog(this.state.newName)) {
+            if (window.confirm(this.state.newName +
+                ' on jo luettelossa. Korvataanko vanha numero uudella?')) {
+                replace(this.state.newName, this.state.newNumber)
+            }
             return
         }
+
         const person = {
             name: this.state.newName,
             number: this.state.newNumber,
