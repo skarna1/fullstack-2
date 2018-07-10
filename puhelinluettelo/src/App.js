@@ -12,15 +12,25 @@ class App extends React.Component {
     }
 
     handleNameChange = (event) => {
-        console.log(event.target.value)
         this.setState({ newName: event.target.value })
+    }
+
+    isNameInCatalog = (name) => {
+        const findPerson = (person) => {
+            return person.name === name;
+        }
+       
+        return (this.state.persons.findIndex(findPerson) !== -1) 
     }
 
     addName = (event) => {
         event.preventDefault()
-        const person = {name:this.state.newName}
+        if (this.isNameInCatalog(this.state.newName)) {
+            return
+        }
+        const person = { name: this.state.newName }
         const persons = this.state.persons.concat(person)
-        this.setState({persons: persons})
+        this.setState({ persons: persons })
     }
 
     render() {
@@ -42,7 +52,7 @@ class App extends React.Component {
                         <li key={person.name}>
                             {person.name} </li>)}
                 </ul>
-               
+
             </div>
         )
     }
