@@ -1,6 +1,5 @@
 import React from 'react';
-import axios from 'axios'
-
+import personService from './services/persons'
 
 const FilterField = ({ filter, handleFilterChange }) => {
     return (
@@ -88,20 +87,21 @@ class App extends React.Component {
             number: this.state.newNumber,
             id: this.state.persons.length + 1
         }
-        const persons = this.state.persons.concat(person)
-        this.setState({ persons: persons })
-        axios
-            .post(
-                "http://localhost:3001/persons",
-                person
-            )
-            .then(r => console.log(r.status))
-            .catch(e => console.log(e));
+
+        personService
+            .create(person)
+            .then(response => {
+                this.setState({
+                    persons: this.state.persons.concat(response.data),
+                    newName: '',
+                    newNumber: ''
+                })
+            })
+
     }
 
     componentDidMount() {
-        axios
-            .get('http://localhost:3001/persons')
+        personService.getAll()
             .then(response => {
                 this.setState({ persons: response.data })
             })
@@ -119,7 +119,7 @@ class App extends React.Component {
                     handleFilterChange={this.handleFieldChange('filter')} />
                 <NewPersonForm
                     newName={this.state.newName}
-                    newNumer={this.state.newNumber}
+                    newNumber={this.state.newNumber}
                     handleNameChange={this.handleFieldChange('newName')}
                     handleNumberChange={this.handleFieldChange('newNumber')}
                     addName={this.addName} />
