@@ -1,4 +1,6 @@
 import React from 'react';
+import axios from 'axios'
+
 
 const FilterField = ({ filter, handleFilterChange }) => {
     return (
@@ -57,10 +59,7 @@ class App extends React.Component {
         super(props)
         this.state = {
             persons: [
-                { name: 'Arto Hellas', number: '040-123456' },
-                { name: 'Martti Tienari', number: '040-123456' },
-                { name: 'Arto Järvinen', number: '040-123456' },
-                { name: 'Lea Kutvonen', number: '040-123456' }
+
             ],
             newName: '',
             newNumber: '',
@@ -68,16 +67,8 @@ class App extends React.Component {
         }
     }
 
-    handleFilterChange = (event) => {
-        this.setState({ filter: event.target.value })
-    }
-
-    handleNameChange = (event) => {
-        this.setState({ newName: event.target.value })
-    }
-
-    handleNumberChange = (event) => {
-        this.setState({ newNumber: event.target.value })
+    handleFieldChange = (field) => (event) => {
+        this.setState({ [field]: event.target.value })
     }
 
     isNameInCatalog = (name) => {
@@ -101,6 +92,13 @@ class App extends React.Component {
         this.setState({ persons: persons })
     }
 
+    componentDidMount() {
+        axios
+            .get('http://localhost:3001/persons')
+            .then(response => {
+                this.setState({ persons: response.data })
+            })
+    }
 
 
     render() {
@@ -111,12 +109,12 @@ class App extends React.Component {
             <div>
                 <h2>Puhelinluettelo</h2>
                 <FilterField filter={this.state.filter}
-                    handleFilterChange={this.handleFilterChange} />
+                    handleFilterChange={this.handleFieldChange('filter')} />
                 <NewPersonForm
                     newName={this.state.newName}
                     newNumer={this.state.newNumber}
-                    handleNameChange={this.handleNameChange}
-                    handleNumberChange={this.handleNumberChange}
+                    handleNameChange={this.handleFieldChange('newName')}
+                    handleNumberChange={this.handleFieldChange('newNumber')}
                     addName={this.addName} />
                 <PersonList persons={getRenderedPersons()} />
             </div>
