@@ -31,23 +31,28 @@ const NewPersonForm = (props) => {
     )
 }
 
-const Person = ({ person }) => {
+const Person = ({ person, deletefunc }) => {
     return (
         <tr>
             <td>{person.name} </td>
             <td>{person.number}</td>
+            <td><button onClick={deletefunc}>poista</button></td>
         </tr>
     )
 }
 
-const PersonList = ({ persons }) => {
+const PersonList = ({ persons, deletefunc }) => {
     return (
         <div>
             <h2>Numerot</h2>
             <table>
                 <tbody>
                     {persons.map(person =>
-                        <Person key={person.name} person={person} />)}
+                        <Person
+                            key={person.name}
+                            person={person}
+                            deletefunc={deletefunc(person.id, person.name)}
+                        />)}
                 </tbody>
             </table>
         </div>
@@ -75,6 +80,18 @@ class App extends React.Component {
         }
 
         return (this.state.persons.findIndex(findPerson) !== -1)
+    }
+
+    deletefunc = (id, name) => () => {
+        if (window.confirm('Poistetaanko ' + name)) {
+            personService
+                .remove(id)
+                .then(response => {
+                    this.setState({
+                        persons: this.state.persons.filter(n => n.id !== id)
+                    })
+                })
+        }
     }
 
     addName = (event) => {
@@ -123,7 +140,8 @@ class App extends React.Component {
                     handleNameChange={this.handleFieldChange('newName')}
                     handleNumberChange={this.handleFieldChange('newNumber')}
                     addName={this.addName} />
-                <PersonList persons={getRenderedPersons()} />
+                <PersonList persons={getRenderedPersons()}
+                    deletefunc={this.deletefunc} />
             </div>
         )
     }
