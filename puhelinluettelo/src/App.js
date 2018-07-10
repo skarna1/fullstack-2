@@ -59,7 +59,6 @@ class App extends React.Component {
         super(props)
         this.state = {
             persons: [
-
             ],
             newName: '',
             newNumber: '',
@@ -86,10 +85,18 @@ class App extends React.Component {
         }
         const person = {
             name: this.state.newName,
-            number: this.state.newNumber
+            number: this.state.newNumber,
+            id: this.state.persons.length + 1
         }
         const persons = this.state.persons.concat(person)
         this.setState({ persons: persons })
+        axios
+            .post(
+                "http://localhost:3001/persons",
+                person
+            )
+            .then(r => console.log(r.status))
+            .catch(e => console.log(e));
     }
 
     componentDidMount() {
