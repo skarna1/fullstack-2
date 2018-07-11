@@ -109,32 +109,70 @@ class App extends React.Component {
                         this.setState({ infoMessage: null })
                     }, 5000)
                 })
+                .catch(error => {
+                    this.setState({
+                        persons: this.state.persons.filter(n => n.id !== id),
+                        infoMessage: 'henkilö ' + name + ' oli jo poistettu'
+                    })
+                    setTimeout(() => {
+                        this.setState({ infoMessage: null })
+                    }, 5000)
+                    console.log('henkilö ' + name + ' oli jo poistettu')
+                })
         }
     }
 
     addName = (event) => {
         event.preventDefault()
 
-        const replace = (name, newNumber) => {
-            const oldperson = this.state.persons.find(n => n.name === name)
-            const updatedperson = { ...oldperson, number: newNumber }
-            console.log(updatedperson)
+        const add = () => {
+            const person = {
+                name: this.state.newName,
+                number: this.state.newNumber,
+                id: this.state.persons.length + 1
+            }
+
             personService
-                .update(updatedperson.id, updatedperson)
-                .then(person => {
+                .create(person)
+                .then(newPerson => {
                     this.setState({
-                        persons: this.state.persons.map(
-                            p => p.id !== updatedperson.id ? p : person),
+                        persons: this.state.persons.concat(newPerson),
                         newName: '',
                         newNumber: '',
-                        infoMessage: 'korvattiin henkilön ' + 
-                        person.name + ' numero numerolla ' + person.number
+                        infoMessage: 'lisättiin ' + newPerson.name
                     })
 
                     setTimeout(() => {
                         this.setState({ infoMessage: null })
                     }, 5000)
                 })
+        }
+        const replace = (name, newNumber) => {
+            const oldperson = this.state.persons.find(n => n.name === name)
+            const updatedPerson = { ...oldperson, number: newNumber }
+            console.log(updatedPerson)
+            personService
+                .update(updatedPerson.id, updatedPerson)
+                .then(person => {
+                    this.setState({
+                        persons: this.state.persons.map(
+                            p => p.id !== updatedPerson.id ? p : person),
+                        newName: '',
+                        newNumber: '',
+                        infoMessage: 'korvattiin henkilön ' +
+                            person.name + ' numero numerolla ' + person.number
+                    })
+                    setTimeout(() => {
+                        this.setState({ infoMessage: null })
+                    }, 5000)
+                })
+                .catch(error => {
+                    this.setState({
+                        persons: this.state.persons.filter(n => n.id !== updatedPerson.id),
+                    })
+                    add()
+                })
+
         }
 
         if (this.isNameInCatalog(this.state.newName)) {
@@ -145,27 +183,7 @@ class App extends React.Component {
             return
         }
 
-        const person = {
-            name: this.state.newName,
-            number: this.state.newNumber,
-            id: this.state.persons.length + 1
-        }
-
-        personService
-            .create(person)
-            .then(newPerson => {
-                this.setState({
-                    persons: this.state.persons.concat(newPerson),
-                    newName: '',
-                    newNumber: '',
-                    infoMessage: 'lisättiin ' + newPerson.name
-                })
-
-                setTimeout(() => {
-                    this.setState({ infoMessage: null })
-                }, 5000)
-            })
-
+        add()
     }
 
     componentDidMount() {

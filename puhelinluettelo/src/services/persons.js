@@ -16,4 +16,5 @@ const remove = (id) =>
 const returnPayload = (request) =>
     request.then(response => response.data)
 
+
 export default { getAll, create, update, remove }
