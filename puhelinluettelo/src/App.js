@@ -1,5 +1,17 @@
 import React from 'react';
+import './index.css'
 import personService from './services/persons'
+
+const Notification = ({ message }) => {
+    if (message === null) {
+        return null
+    }
+    return (
+        <div className="info">
+            {message}
+        </div>
+    )
+}
 
 const FilterField = ({ filter, handleFilterChange }) => {
     return (
@@ -58,6 +70,7 @@ const PersonList = ({ persons, deletefunc }) => {
         </div>
     )
 }
+
 class App extends React.Component {
     constructor(props) {
         super(props)
@@ -66,7 +79,8 @@ class App extends React.Component {
             ],
             newName: '',
             newNumber: '',
-            filter: ''
+            filter: '',
+            infoMessage: null
         }
     }
 
@@ -88,8 +102,12 @@ class App extends React.Component {
                 .remove(id)
                 .then(response => {
                     this.setState({
-                        persons: this.state.persons.filter(n => n.id !== id)
+                        persons: this.state.persons.filter(n => n.id !== id),
+                        infoMessage: 'poistettiin ' + name
                     })
+                    setTimeout(() => {
+                        this.setState({ infoMessage: null })
+                    }, 5000)
                 })
         }
     }
@@ -108,8 +126,14 @@ class App extends React.Component {
                         persons: this.state.persons.map(
                             p => p.id !== updatedperson.id ? p : person),
                         newName: '',
-                        newNumber: ''
+                        newNumber: '',
+                        infoMessage: 'korvattiin henkilön ' + 
+                        person.name + ' numero numerolla ' + person.number
                     })
+
+                    setTimeout(() => {
+                        this.setState({ infoMessage: null })
+                    }, 5000)
                 })
         }
 
@@ -133,8 +157,13 @@ class App extends React.Component {
                 this.setState({
                     persons: this.state.persons.concat(newPerson),
                     newName: '',
-                    newNumber: ''
+                    newNumber: '',
+                    infoMessage: 'lisättiin ' + newPerson.name
                 })
+
+                setTimeout(() => {
+                    this.setState({ infoMessage: null })
+                }, 5000)
             })
 
     }
@@ -153,6 +182,7 @@ class App extends React.Component {
         return (
             <div>
                 <h2>Puhelinluettelo</h2>
+                <Notification message={this.state.infoMessage} />
                 <FilterField filter={this.state.filter}
                     handleFilterChange={this.handleFieldChange('filter')} />
                 <NewPersonForm
