@@ -98,15 +98,15 @@ class App extends React.Component {
         event.preventDefault()
 
         const replace = (name, newNumber) => {
-            const person = this.state.persons.find(n => n.name === name)
-            const updatedperson = { ...person, number: newNumber }
+            const oldperson = this.state.persons.find(n => n.name === name)
+            const updatedperson = { ...oldperson, number: newNumber }
             console.log(updatedperson)
             personService
                 .update(updatedperson.id, updatedperson)
-                .then(response => {
+                .then(person => {
                     this.setState({
                         persons: this.state.persons.map(
-                            p => p.id !== person.id ? p : response.data),
+                            p => p.id !== updatedperson.id ? p : person),
                         newName: '',
                         newNumber: ''
                     })
@@ -129,9 +129,9 @@ class App extends React.Component {
 
         personService
             .create(person)
-            .then(response => {
+            .then(newPerson => {
                 this.setState({
-                    persons: this.state.persons.concat(response.data),
+                    persons: this.state.persons.concat(newPerson),
                     newName: '',
                     newNumber: ''
                 })
@@ -141,11 +141,10 @@ class App extends React.Component {
 
     componentDidMount() {
         personService.getAll()
-            .then(response => {
-                this.setState({ persons: response.data })
+            .then(persons => {
+                this.setState({ persons })
             })
     }
-
 
     render() {
         const getRenderedPersons = () =>
